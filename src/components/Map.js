@@ -1,13 +1,14 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import mapboxgl from 'mapbox-gl/dist/mapbox-gl';
+import PropTypes from 'prop-types';
+import mapboxgl from 'mapbox-gl';
 import turfBbox from '@turf/bbox';
 import turfBboxPolygon from '@turf/bbox-polygon';
 import turfBuffer from '@turf/buffer';
 import turfDistance from '@turf/distance';
 import _ from 'lodash';
-import streetsStyle from '../styles/streets.json';
-import satelliteStyle from '../styles/satellite.json';
+// import streetsStyle from '../styles/streets.json';
+// import satelliteStyle from '../styles/satellite.json';
 import {setStateValue, setUserLocation, triggerMapUpdate, getRoute, getReverseGeocode} from '../actions/index';
 
 class MapComponent extends Component {
@@ -33,7 +34,7 @@ class MapComponent extends Component {
 
     const map = new mapboxgl.Map({
       container: 'map',
-      style: this.getStyle(streetsStyle),
+      style: 'mapbox://styles/planemad/cirnjr9do000pgxma53mkgdw0',
       center: this.props.center,
       zoom: this.props.zoom,
       minZoom: 2,
@@ -130,8 +131,8 @@ class MapComponent extends Component {
     }
 
     if (this.props.needMapRestyle) {
-      if (this.props.mapStyle === 'satellite') this.map.setStyle(this.getStyle(satelliteStyle));
-      else if (this.props.mapStyle === 'streets') this.map.setStyle(this.getStyle(streetsStyle));
+      // if (this.props.mapStyle === 'satellite') this.map.setStyle(this.getStyle(defaultStyle));
+      // else if (this.props.mapStyle === 'streets') this.map.setStyle(this.getStyle(defaultStyle));
     } else {
       // No need to re-update until the state says so
       this.props.setStateValue('needMapUpdate', false);
@@ -163,7 +164,7 @@ class MapComponent extends Component {
   mouseDown(e) {
     if (!this.state.isDragging && !this.state.isCursorOverPoint) return;
 
-    var features = this.map.queryRenderedFeatures(e.point, {layers: this.movableLayers});
+    let features = this.map.queryRenderedFeatures(e.point, {layers: this.movableLayers});
     if (!features.length) return;
 
 
@@ -185,7 +186,7 @@ class MapComponent extends Component {
     const layerId = this.state.draggedLayer;
     if (this.movableLayers.indexOf(layerId) < 0) return;
 
-    var coords = [e.lngLat.lng, e.lngLat.lat];
+    let coords = [e.lngLat.lng, e.lngLat.lat];
     this.setState({draggedCoords: coords});
 
     // Set a UI indicator for dragging.
@@ -230,12 +231,13 @@ class MapComponent extends Component {
   }
 
   onClick(e) {
-    var features = this.map.queryRenderedFeatures(e.point, {layers: this.selectableLayers});
+    let features = this.map.queryRenderedFeatures(e.point);
+
     if (!features.length) {
       return;
     }
 
-    var feature = features[0];
+    let feature = features[0];
 
     let key;
     if (this.props.mode === 'search') {
@@ -261,6 +263,26 @@ class MapComponent extends Component {
   }
 
   onLoad() {
+    this.map.addSource('geolocation', {
+      type: 'geojson',
+      data: this.emptyData
+    });
+
+    this.map.addSource('route', {
+      type: 'geojson',
+      data: this.emptyData
+    });
+
+    this.map.addSource('marker', {
+      type: 'geojson',
+      data: this.emptyData
+    });
+
+    this.map.addSource('fromMarker', {
+      type: 'geojson',
+      data: this.emptyData
+    });
+
     // helper to set geolocation
     const setGeolocation = (data) => {
       const geometry = {type: 'Point', coordinates: [data.coords.longitude, data.coords.latitude]};
@@ -283,7 +305,7 @@ class MapComponent extends Component {
     }
 
     // Regularly poll the user location and update the map
-    window.setInterval(() => {
+    /*window.setInterval(() => {
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition((data) => {
           const geometry = {type: 'Point', coordinates: [data.coords.longitude, data.coords.latitude]};
@@ -291,14 +313,14 @@ class MapComponent extends Component {
           this.props.setUserLocation(geometry.coordinates);
         });
       }
-    }, 10000);
+    }, 10000);*/
 
     // Set event listeners
 
     this.map.on('click', (e) => this.onClick(e));
 
     this.map.on('mousemove', (e) => {
-      var features = this.map.queryRenderedFeatures(e.point, {layers: this.movableLayers.concat(this.selectableLayers)});
+      let features = this.map.queryRenderedFeatures(e.point);
 
       if (features.length) {
         this.map.getCanvas().style.cursor = 'pointer';
@@ -313,7 +335,7 @@ class MapComponent extends Component {
       }
     });
 
-    this.map.on('mousedown', (e) => this.mouseDown(e), true);
+    // this.map.on('mousedown', (e) => this.mouseDown(e), true);
 
     this.map.on('moveend', () => {
       const center = this.map.getCenter();
@@ -346,7 +368,7 @@ class MapComponent extends Component {
     };
 
     // Index to insert the route layers
-    var i;
+    let i;
     if (style.name === 'MapboxMaps') {
       i = s.layers.map(el => el.id).indexOf('bridge-oneway-arrows-white');
     } else {
@@ -448,28 +470,28 @@ class MapComponent extends Component {
 }
 
 MapComponent.propTypes = {
-  accessToken: React.PropTypes.string,
-  center: React.PropTypes.array,
-  directionsFrom: React.PropTypes.object,
-  directionsTo: React.PropTypes.object,
-  getReverseGeocode: React.PropTypes.func,
-  getRoute: React.PropTypes.func,
-  map: React.PropTypes.object,
-  mapStyle: React.PropTypes.string,
-  modality: React.PropTypes.string,
-  mode: React.PropTypes.string,
-  needMapRepan: React.PropTypes.bool,
-  needMapRestyle: React.PropTypes.bool,
-  needMapUpdate: React.PropTypes.bool,
-  route: React.PropTypes.object,
-  routeStatus: React.PropTypes.string,
-  searchLocation: React.PropTypes.object,
-  setStateValue: React.PropTypes.func,
-  setUserLocation: React.PropTypes.func,
-  style: React.PropTypes.string,
-  triggerMapUpdate: React.PropTypes.func,
-  userLocation: React.PropTypes.object,
-  zoom: React.PropTypes.number,
+  accessToken: PropTypes.string,
+  center: PropTypes.array,
+  directionsFrom: PropTypes.object,
+  directionsTo: PropTypes.object,
+  getReverseGeocode: PropTypes.func,
+  getRoute: PropTypes.func,
+  map: PropTypes.object,
+  mapStyle: PropTypes.string,
+  modality: PropTypes.string,
+  mode: PropTypes.string,
+  needMapRepan: PropTypes.bool,
+  needMapRestyle: PropTypes.bool,
+  needMapUpdate: PropTypes.bool,
+  route: PropTypes.object,
+  routeStatus: PropTypes.string,
+  searchLocation: PropTypes.object,
+  setStateValue: PropTypes.func,
+  setUserLocation: PropTypes.func,
+  style: PropTypes.string,
+  triggerMapUpdate: PropTypes.func,
+  userLocation: PropTypes.object,
+  zoom: PropTypes.number,
 };
 
 const mapStateToProps = (state) => {

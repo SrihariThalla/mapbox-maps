@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
+import PropTypes from 'prop-types';
 import Geocoder from './Geocoder';
 import PlaceName from './PlaceName';
 import CloseButton from './CloseButton';
@@ -194,22 +195,22 @@ class Directions extends Component {
 }
 
 Directions.propTypes = {
-  directionsFrom: React.PropTypes.object,
-  directionsFromString: React.PropTypes.string,
-  directionsTo: React.PropTypes.object,
-  directionsToString: React.PropTypes.string,
-  modality: React.PropTypes.string,
-  route: React.PropTypes.object,
-  routeStatus: React.PropTypes.string,
-  setDirectionsLocation: React.PropTypes.func,
-  setModality: React.PropTypes.func,
-  setMode: React.PropTypes.func,
-  setRoute: React.PropTypes.func,
-  setStateValue: React.PropTypes.func,
-  triggerMapUpdate: React.PropTypes.func,
-  userLocation: React.PropTypes.object,
-  writeSearchFrom: React.PropTypes.func,
-  writeSearchTo: React.PropTypes.func,
+  directionsFrom: PropTypes.object,
+  directionsFromString: PropTypes.string,
+  directionsTo: PropTypes.object,
+  directionsToString: PropTypes.string,
+  modality: PropTypes.string,
+  route: PropTypes.object,
+  routeStatus: PropTypes.string,
+  setDirectionsLocation: PropTypes.func,
+  setModality: PropTypes.func,
+  setMode: PropTypes.func,
+  setRoute: PropTypes.func,
+  setStateValue: PropTypes.func,
+  triggerMapUpdate: PropTypes.func,
+  userLocation: PropTypes.object,
+  writeSearchFrom: PropTypes.func,
+  writeSearchTo: PropTypes.func,
 };
 
 const mapStateToProps = (state) => {

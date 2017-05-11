@@ -2,7 +2,7 @@ import polyline from '@mapbox/polyline';
 
 const defaultState = {
   // Mapbox Access Token
-  mapboxAccessToken: process.env.REACT_APP_MAPBOX_TOKEN,
+  mapboxAccessToken: 'pk.eyJ1IjoicGxhbmVtYWQiLCJhIjoiY2l3ZmNjNXVzMDAzZzJ0cDV6b2lkOG9odSJ9.eep6sUoBS0eMN4thZUWpyQ',
   // Map
   mapCenter: [-122.4, 37.8],
   mapZoom: 10,

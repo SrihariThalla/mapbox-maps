@@ -1,13 +1,16 @@
 import React, {Component} from 'react';
+import PropTypes from 'prop-types';
 
 class PlaceName extends Component {
   render() {
-    var parts = this.props.location.place_name.split(', ');
-    if (parts.length < 1) return null;
-    var main = parts[0];
-    var rest = parts.slice(1).join(', ');
+    if (this.props.location.place_name === undefined) return null;
 
-    var mainColor, restColor;
+    let parts = this.props.location.place_name.split(', ');
+    if (parts.length < 1) return null;
+    let main = parts[0];
+    let rest = parts.slice(1).join(', ');
+
+    let mainColor, restColor;
     if (this.props.colors === 'light') {
       mainColor = 'color-white';
       restColor = 'color-lighten50';
@@ -30,9 +33,9 @@ class PlaceName extends Component {
 }
 
 PlaceName.propTypes = {
-  colors: React.PropTypes.string,
-  location: React.PropTypes.object,
-  onClick: React.PropTypes.func
+  colors: PropTypes.string,
+  location: PropTypes.object,
+  onClick: PropTypes.func
 };
 
 PlaceName.defaultProps = {

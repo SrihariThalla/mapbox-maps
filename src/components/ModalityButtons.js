@@ -1,4 +1,5 @@
 import React, {Component} from 'react';
+import PropTypes from 'prop-types';
 
 class ModalityButtons extends Component {
   render() {
@@ -21,8 +22,8 @@ class ModalityButtons extends Component {
 }
 
 ModalityButtons.propTypes = {
-  modality: React.PropTypes.string,
-  onSetModality: React.PropTypes.func
+  modality: PropTypes.string,
+  onSetModality: PropTypes.func
 };
 
 ModalityButtons.defaultProps = {

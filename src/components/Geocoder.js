@@ -2,6 +2,8 @@
 
 import React from 'react';
 import {connect} from 'react-redux';
+import PropTypes from 'prop-types';
+import createReactClass from 'create-react-class';
 import PlaceName from './PlaceName';
 import xhr from 'xhr';
 
@@ -9,7 +11,7 @@ import xhr from 'xhr';
  * Geocoder component: connects to Mapbox.com Geocoding API
  * and provides an autocompleting interface for finding locations.
  */
-var Geocoder = React.createClass({
+var Geocoder = createReactClass({
   getDefaultProps() {
     return {
       endpoint: 'https://api.tiles.mapbox.com',
@@ -31,21 +33,21 @@ var Geocoder = React.createClass({
     };
   },
   propTypes: {
-    endpoint: React.PropTypes.string,
-    source: React.PropTypes.string,
-    inputPosition: React.PropTypes.string,
-    inputPlaceholder: React.PropTypes.string,
-    inputClass: React.PropTypes.string,
-    resultsClass: React.PropTypes.string,
-    onSelect: React.PropTypes.func.isRequired,
-    onSuggest: React.PropTypes.func,
-    accessToken: React.PropTypes.string.isRequired,
-    proximity: React.PropTypes.string,
-    bbox: React.PropTypes.string,
-    focusOnMount: React.PropTypes.bool,
-    types: React.PropTypes.string,
-    searchString: React.PropTypes.string,
-    writeSearch: React.PropTypes.func
+    endpoint: PropTypes.string,
+    source: PropTypes.string,
+    inputPosition: PropTypes.string,
+    inputPlaceholder: PropTypes.string,
+    inputClass: PropTypes.string,
+    resultsClass: PropTypes.string,
+    onSelect: PropTypes.func.isRequired,
+    onSuggest: PropTypes.func,
+    accessToken: PropTypes.string.isRequired,
+    proximity: PropTypes.string,
+    bbox: PropTypes.string,
+    focusOnMount: PropTypes.bool,
+    types: PropTypes.string,
+    searchString: PropTypes.string,
+    writeSearch: PropTypes.func
   },
   onInput(e) {
     this.setState({loading: true});

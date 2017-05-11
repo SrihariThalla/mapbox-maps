@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
+import PropTypes from 'prop-types';
 
 class RoutePanel extends Component {
   render() {
@@ -52,9 +53,9 @@ class RoutePanel extends Component {
 }
 
 RoutePanel.propTypes = {
-  modality: React.PropTypes.string,
-  route: React.PropTypes.object,
-  routeStatus: React.PropTypes.string.isRequired,
+  modality: PropTypes.string,
+  route: PropTypes.object,
+  routeStatus: PropTypes.string.isRequired,
 };
 
 const mapStateToProps = (state) => {

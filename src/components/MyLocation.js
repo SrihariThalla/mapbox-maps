@@ -1,4 +1,5 @@
 import React, {Component} from 'react';
+import PropTypes from 'prop-types';
 import PlaceName from './PlaceName';
 
 class MyLocation extends Component {
@@ -20,8 +21,8 @@ class MyLocation extends Component {
 }
 
 MyLocation.propTypes = {
-  onClick: React.PropTypes.func,
-  userLocation: React.PropTypes.object,
+  onClick: PropTypes.func,
+  userLocation: PropTypes.object,
 };
 
 MyLocation.defaultProps = {

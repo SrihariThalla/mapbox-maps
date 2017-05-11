@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
+import PropTypes from 'prop-types';
 import Geocoder from './Geocoder';
 import PlaceName from './PlaceName';
 import CloseButton from './CloseButton';
@@ -91,16 +92,16 @@ class Search extends Component {
 }
 
 Search.propTypes = {
-  getPlaceInfo: React.PropTypes.func,
-  placeInfo: React.PropTypes.object,
-  searchLocation: React.PropTypes.object,
-  searchString: React.PropTypes.string,
-  setDirectionsLocation: React.PropTypes.func,
-  setMode: React.PropTypes.func,
-  setPlaceInfo: React.PropTypes.func,
-  setSearchLocation: React.PropTypes.func,
-  triggerMapUpdate: React.PropTypes.func,
-  writeSearch: React.PropTypes.func,
+  getPlaceInfo: PropTypes.func,
+  placeInfo: PropTypes.object,
+  searchLocation: PropTypes.object,
+  searchString: PropTypes.string,
+  setDirectionsLocation: PropTypes.func,
+  setMode: PropTypes.func,
+  setPlaceInfo: PropTypes.func,
+  setSearchLocation: PropTypes.func,
+  triggerMapUpdate: PropTypes.func,
+  writeSearch: PropTypes.func,
 };
 
 const mapStateToProps = (state) => {

@@ -1,6 +1,8 @@
 import React from 'react';
+import PropTypes from 'prop-types';
+import createReactClass from 'create-react-class';
 
-var ImageWithFallback = React.createClass({
+var ImageWithFallback = createReactClass({
   getInitialState() {
     return {
       status: 'primary'
@@ -28,10 +30,10 @@ var ImageWithFallback = React.createClass({
   },
 
   propTypes: {
-    alt: React.PropTypes.string,
-    className: React.PropTypes.string,
-    primary: React.PropTypes.string,
-    secondary: React.PropTypes.string,
+    alt: PropTypes.string,
+    className: PropTypes.string,
+    primary: PropTypes.string,
+    secondary: PropTypes.string,
   }
 });
 

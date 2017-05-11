@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
+import PropTypes from 'prop-types';
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 import {triggerMapUpdate, setStateValue} from '../actions/index';
 
@@ -42,12 +43,12 @@ class StyleSwitch extends Component {
 }
 
 StyleSwitch.propTypes = {
-  accessToken: React.PropTypes.string,
-  center: React.PropTypes.array,
-  setStateValue: React.PropTypes.func,
-  mapStyle: React.PropTypes.string,
-  triggerMapUpdate: React.PropTypes.func,
-  zoom: React.PropTypes.number,
+  accessToken: PropTypes.string,
+  center: PropTypes.array,
+  setStateValue: PropTypes.func,
+  mapStyle: PropTypes.string,
+  triggerMapUpdate: PropTypes.func,
+  zoom: PropTypes.number,
 };
 
 const mapStateToProps = (state) => {

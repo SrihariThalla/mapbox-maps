@@ -1,9 +1,10 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
+import PropTypes from 'prop-types';
 import MapComponent from './Map';
 import Search from './Search';
 import Directions from './Directions';
-import StyleSwitch from './StyleSwitch';
+// import StyleSwitch from './StyleSwitch';
 
 class App extends Component {
   render() {
@@ -18,11 +19,11 @@ class App extends Component {
           }
         </div>
         {
-          (window.innerWidth > 640)
+          /*(window.innerWidth > 640)
           ? <div className='style-switch absolute bottom mb36 mx12 border border--2 border--white shadow-darken25'>
             <StyleSwitch/>
           </div>
-          : null
+          : null*/
         }
       </div>
     );
@@ -30,9 +31,9 @@ class App extends Component {
 }
 
 App.propTypes = {
-  mode: React.PropTypes.string,
-  route: React.PropTypes.object,
-  routeStatus: React.PropTypes.string
+  mode: PropTypes.string,
+  route: PropTypes.object,
+  routeStatus: PropTypes.string
 };
 
 const mapStateToProps = (state) => {

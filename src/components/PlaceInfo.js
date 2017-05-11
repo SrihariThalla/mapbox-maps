@@ -1,4 +1,5 @@
 import React, {Component} from 'react';
+import PropTypes from 'prop-types';
 import ImageWithFallback from './ImageWithFallback';
 import directionsIcon from '../assets/directions.svg';
 import md5 from 'blueimp-md5';
@@ -103,8 +104,8 @@ class PlaceInfo extends Component {
 }
 
 PlaceInfo.propTypes = {
-  clickDirections: React.PropTypes.func,
-  info: React.PropTypes.object,
+  clickDirections: PropTypes.func,
+  info: PropTypes.object,
 };
 
 export default PlaceInfo;

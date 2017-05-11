@@ -1,4 +1,4 @@
-import wdk from 'wikidata-sdk/dist/wikidata-sdk.js';
+import wdk from 'wikidata-sdk';
 
 const apiCaller = (store) => (next) => (action) => { // eslint-disable-line
 
