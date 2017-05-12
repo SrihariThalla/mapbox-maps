@@ -34,7 +34,7 @@ class MapComponent extends Component {
 
     const map = new mapboxgl.Map({
       container: 'map',
-      style: 'mapbox://styles/planemad/cirnjr9do000pgxma53mkgdw0',
+      style: 'mapbox://styles/mapbox/streets-v9',
       center: this.props.center,
       zoom: this.props.zoom,
       minZoom: 2,
@@ -53,7 +53,6 @@ class MapComponent extends Component {
 
     // This is where we update the layers and map bbox
     this.map.getSource('geolocation').setData(this.props.userLocation.geometry);
-
 
     // Search mode
     if (this.props.mode === 'search') {
