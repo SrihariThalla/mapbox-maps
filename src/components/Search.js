@@ -29,16 +29,16 @@ class Search extends Component {
             focusOnMount={true}
           />
           : <div className={this.styles.input + ' flex-parent flex-parent--center-cross flex-parent--center-main'}>
-            <div className='w-full w420-mm pr42 txt-truncate'>
-              <PlaceName
-                location={this.props.searchLocation}
-                onClick={() => {
-                  this.props.writeSearch(this.props.searchLocation.place_name);
-                  this.props.setSearchLocation(null);
-                  this.props.setPlaceInfo(null);
-                }}
-              />
-            </div>
+              <div className='w-full w420-mm pr42 txt-truncate'>
+                <PlaceName
+                  location={this.props.searchLocation}
+                  onClick={() => {
+                    this.props.writeSearch(this.props.searchLocation.place_name);
+                    this.props.setSearchLocation(null);
+                    this.props.setPlaceInfo(null);
+                  }}
+                />
+              </div>
             <div
               className={'mr30 cursor-pointer right ' + this.styles.icon}
               onClick={() => this.clickDirections()}
