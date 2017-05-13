@@ -14,7 +14,7 @@
     "@mapbox/react-geocoder": "^2.5.0",
     "@turf/bbox": "^4.3.0",
     "@turf/bbox-polygon": "^4.3.0",
-    "@turf/buffer": "^4.3.0",
+    "@turf/buffer": "^4.3.1",
     "@turf/distance": "^4.3.0",
     "blueimp-md5": "^2.7.0",
     "create-react-class": "^15.5.3",

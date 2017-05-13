@@ -9,6 +9,7 @@ import turfDistance from '@turf/distance';
 import _ from 'lodash';
 // import streetsStyle from '../styles/streets.json';
 // import satelliteStyle from '../styles/satellite.json';
+import publicmapStyle from '../styles/publicmap.json';
 import {setStateValue, setUserLocation, triggerMapUpdate, getRoute, getReverseGeocode} from '../actions/index';
 
 class MapComponent extends Component {
@@ -34,7 +35,7 @@ class MapComponent extends Component {
 
     const map = new mapboxgl.Map({
       container: 'map',
-      style: 'mapbox://styles/mapbox/streets-v9',
+      style: this.getStyle(publicmapStyle),
       center: this.props.center,
       zoom: this.props.zoom,
       minZoom: 2,
@@ -130,6 +131,7 @@ class MapComponent extends Component {
     }
 
     if (this.props.needMapRestyle) {
+      this.map.setStyle(this.getStyle(publicmapStyle));
       // if (this.props.mapStyle === 'satellite') this.map.setStyle(this.getStyle(defaultStyle));
       // else if (this.props.mapStyle === 'streets') this.map.setStyle(this.getStyle(defaultStyle));
     } else {
@@ -262,26 +264,6 @@ class MapComponent extends Component {
   }
 
   onLoad() {
-    this.map.addSource('geolocation', {
-      type: 'geojson',
-      data: this.emptyData
-    });
-
-    this.map.addSource('route', {
-      type: 'geojson',
-      data: this.emptyData
-    });
-
-    this.map.addSource('marker', {
-      type: 'geojson',
-      data: this.emptyData
-    });
-
-    this.map.addSource('fromMarker', {
-      type: 'geojson',
-      data: this.emptyData
-    });
-
     // helper to set geolocation
     const setGeolocation = (data) => {
       const geometry = {type: 'Point', coordinates: [data.coords.longitude, data.coords.latitude]};
@@ -374,6 +356,8 @@ class MapComponent extends Component {
       i = s.layers.map(el => el.id).indexOf('waterway-label');
     }
 
+    s.layers = this.removeLayerFromStyle(s.layers, 'mapbox-mapbox-satellite');
+
     s.layers.splice(i, 0,
       {
         'id': 'route-casing',
@@ -432,6 +416,16 @@ class MapComponent extends Component {
     ]);
 
     return s;
+  }
+
+  removeLayerFromStyle(layers, id) {
+    layers.forEach(function (layer, index) {
+      if (layer.hasOwnProperty('id') && layer.id === id) {
+        layers.splice(index, 1);
+      }
+    }, id);
+
+    return layers;
   }
 
   layerToKey(layer) {

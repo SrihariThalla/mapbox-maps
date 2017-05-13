@@ -42,9 +42,9 @@
   dependencies:
     "@turf/meta" "^4.3.0"
 
-"@turf/buffer@^4.3.0":
-  version "4.3.0"
-  resolved "https://registry.yarnpkg.com/@turf/buffer/-/buffer-4.3.0.tgz#d9b946e44e6974ac40193ac950d4057b23adeb56"
+"@turf/buffer@^4.3.1":
+  version "4.3.1"
+  resolved "https://registry.yarnpkg.com/@turf/buffer/-/buffer-4.3.1.tgz#f80fdd4377eef8c2d5dcaded928bb7293f89129d"
   dependencies:
     "@turf/center" "^4.3.0"
     "@turf/circle" "^4.3.0"
