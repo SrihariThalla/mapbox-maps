@@ -2,8 +2,7 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 import CloseButton from './CloseButton';
-import queryOverpass from 'query-overpass';
-import {setStateValue, triggerMapUpdate} from '../actions/index';
+import {getOverpassData, setStateValue, triggerMapUpdate} from '../actions/index';
 
 class Overpass extends Component {
   constructor() {
@@ -12,27 +11,16 @@ class Overpass extends Component {
     this.state = {
       focus: null,
       loading: false,
-      searchTime: new Date(),
-      overpassQuery: null
     };
   }
 
   onInput(e) {
-    this.setState({
-      overpassQuery: e.target.value
-    });
+    this.props.writeOverpassQuery(e.target.value);
   }
 
-  onKeyDown(e) {
-    switch (e.which) {
-    // accept
-    case 13:
-      console.log(this.state.overpassQuery);
-      console.log(queryOverpass(this.state.overpassQuery));
-      break;
-
-    default:
-      break;
+  onKeyPress(e) {
+    if (e.which === 13) {
+      this.props.getOverpassData(this.props.overpassQuery);
     }
   }
 
@@ -40,8 +28,8 @@ class Overpass extends Component {
     let input = <input
       ref={(input) => { this.input = input; }}
       className={this.props.inputClass}
-      onInput={this.onInput.bind(this)}
-      onKeyDown={this.onKeyDown.bind(this)}
+      // onInput={this.onInput.bind(this)}
+      onKeyPress={this.onKeyPress.bind(this)}
       value={this.props.overpassQuery}
       onChange={this.onInput.bind(this)}
       placeholder='Overpass Query'
@@ -54,11 +42,10 @@ class Overpass extends Component {
           <svg className='icon color-gray'><use xlinkHref='#icon-search'></use></svg>
         </div>
         <div className='w-full'>
-          {this.props.inputPosition === 'top' && input}
-          {this.props.inputPosition === 'bottom' && input}
+          {input}
         </div>
         <CloseButton
-          show={(this.props.overpassQuery !== '' || this.props.overpassQuery !== null)}
+          show={(this.props.overpassQuery !== '' && this.state.overpassQuery !== null)}
           onClick={() => this.closeSearch()}
         />
       </div>
@@ -80,29 +67,29 @@ class Overpass extends Component {
 }
 
 Overpass.propTypes = {
-  overpassQuery: PropTypes.string,
-  triggerMapUpdate: PropTypes.func,
-  writeOverpass: PropTypes.func,
-  inputPosition: PropTypes.string,
+  getOverpassData: PropTypes.func,
+  focusOnMount: PropTypes.bool,
   inputPlaceholder: PropTypes.string,
   inputClass: PropTypes.string,
-  proximity: PropTypes.string,
-  bbox: PropTypes.string,
-  focusOnMount: PropTypes.bool,
+  overpassQuery: PropTypes.string,
+  overpassData: PropTypes.object,
+  triggerMapUpdate: PropTypes.func,
+  writeOverpassData: PropTypes.func,
+  writeOverpassQuery: PropTypes.func,
 };
 
 const mapStateToProps = (state) => {
   return {
-    placeInfo: state.placeInfo,
-    searchLocation: state.searchLocation,
     overpassQuery: state.overpassQuery,
+    overpassData: state.overpassData,
   };
 };
 
 const mapDispatchToProps = (dispatch) => {
   return {
+    getOverpassData: (query) => dispatch(getOverpassData(query)),
     triggerMapUpdate: (repan) => dispatch(triggerMapUpdate(repan)),
-    writeOverpass: (input) => dispatch(setStateValue('overpassQuery', input)),
+    writeOverpassQuery: (query) => dispatch(setStateValue('overpassQuery', query)),
   };
 };
 

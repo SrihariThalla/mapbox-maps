@@ -30,6 +30,24 @@
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/@mapbox/whoots-js/-/whoots-js-3.0.0.tgz#c1de4293081424da3ac30c23afa850af1019bb54"
 
+"@sriharithalla/jsonstream@^1.3.1":
+  version "1.3.1"
+  resolved "https://registry.yarnpkg.com/@sriharithalla/jsonstream/-/jsonstream-1.3.1.tgz#38c61189c2aee56d2c73ea44cef5b74bc83c09b8"
+  dependencies:
+    jsonparse "^1.2.0"
+    through ">=2.2.7 <3"
+
+"@sriharithalla/query-overpass@^1.4.1":
+  version "1.4.1"
+  resolved "https://registry.yarnpkg.com/@sriharithalla/query-overpass/-/query-overpass-1.4.1.tgz#878c1ab6c0ef5c4e00f1c34e7dea97191d04918a"
+  dependencies:
+    "@sriharithalla/jsonstream" "^1.3.1"
+    concat-stream "^1.6.0"
+    minimist "^1.2.0"
+    osmtogeojson "^3.0.0-beta.0"
+    request "^2.81.0"
+    xhr "^2.4.0"
+
 "@turf/bbox-polygon@^4.3.0":
   version "4.3.0"
   resolved "https://registry.yarnpkg.com/@turf/bbox-polygon/-/bbox-polygon-4.3.0.tgz#c75ca4159a35454b79dba1090c499f9f01cac95c"
@@ -99,13 +117,6 @@ JSONStream@0.8.0:
   dependencies:
     jsonparse "0.0.5"
     through "~2.2.7"
-
-JSONStream@^1.3.1:
-  version "1.3.1"
-  resolved "https://registry.yarnpkg.com/JSONStream/-/JSONStream-1.3.1.tgz#707f761e01dae9e16f1bcf93703b78c70966579a"
-  dependencies:
-    jsonparse "^1.2.0"
-    through ">=2.2.7 <3"
 
 abab@^1.0.3:
   version "1.0.3"
@@ -1145,8 +1156,8 @@ balanced-match@^0.4.1, balanced-match@^0.4.2:
   resolved "https://registry.yarnpkg.com/balanced-match/-/balanced-match-0.4.2.tgz#cb3f3e3c732dc0f01ee70b403f302e61d7709838"
 
 base62@^1.1.0:
-  version "1.1.2"
-  resolved "https://registry.yarnpkg.com/base62/-/base62-1.1.2.tgz#22ced6a49913565bc0b8d9a11563a465c084124c"
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/base62/-/base62-1.2.0.tgz#31e7e560dc846c9f44c1a531df6514da35474157"
 
 base64-js@0.0.2:
   version "0.0.2"
@@ -1371,8 +1382,8 @@ caniuse-api@^1.5.2:
     lodash.uniq "^4.5.0"
 
 caniuse-db@^1.0.30000529, caniuse-db@^1.0.30000618, caniuse-db@^1.0.30000639:
-  version "1.0.30000667"
-  resolved "https://registry.yarnpkg.com/caniuse-db/-/caniuse-db-1.0.30000667.tgz#fb6060dbf349c101df26f421442419802fc6dab1"
+  version "1.0.30000670"
+  resolved "https://registry.yarnpkg.com/caniuse-db/-/caniuse-db-1.0.30000670.tgz#90d33b79e3090e25829c311113c56d6b1788bf43"
 
 cardinal@^1.0.0:
   version "1.0.0"
@@ -2134,8 +2145,8 @@ error-ex@^1.2.0:
     is-arrayish "^0.2.1"
 
 es5-ext@^0.10.14, es5-ext@^0.10.9, es5-ext@~0.10.14:
-  version "0.10.16"
-  resolved "https://registry.yarnpkg.com/es5-ext/-/es5-ext-0.10.16.tgz#1ef1b04f3d09db6a5d630226d62202f2e425e45a"
+  version "0.10.18"
+  resolved "https://registry.yarnpkg.com/es5-ext/-/es5-ext-0.10.18.tgz#dc239d3dce4c22b9c939aa180878837a3c0b5c92"
   dependencies:
     es6-iterator "2"
     es6-symbol "~3.1"
@@ -2302,9 +2313,9 @@ eslint-plugin-react@6.4.1:
     doctrine "^1.2.2"
     jsx-ast-utils "^1.3.1"
 
-eslint-plugin-react@^7.0.0:
-  version "7.0.0"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-react/-/eslint-plugin-react-7.0.0.tgz#084cfe772d229ec5ae7e525dfc6d299cc21ddd77"
+eslint-plugin-react@^7.0.1:
+  version "7.0.1"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-react/-/eslint-plugin-react-7.0.1.tgz#e78107e1e559c6e2b17786bb67c2e2a010ad0d2f"
   dependencies:
     doctrine "^2.0.0"
     has "^1.0.1"
@@ -2848,7 +2859,15 @@ geojson-numeric@0.2.0:
     concat-stream "~1.0.1"
     optimist "~0.3.5"
 
-geojson-rewind@0.1.0, geojson-rewind@^0.1.0:
+geojson-rewind@0.2.0, geojson-rewind@^0.2.0:
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/geojson-rewind/-/geojson-rewind-0.2.0.tgz#ea558e9e44ff03b8655d0a08b75078dc33a15e79"
+  dependencies:
+    concat-stream "~1.2.1"
+    geojson-area "0.1.0"
+    minimist "0.0.5"
+
+geojson-rewind@^0.1.0:
   version "0.1.0"
   resolved "https://registry.yarnpkg.com/geojson-rewind/-/geojson-rewind-0.1.0.tgz#57022a054b196660d755354fe5d26684d90cd019"
   dependencies:
@@ -4506,17 +4525,18 @@ osm-polygon-features@^0.9.1:
   version "0.9.2"
   resolved "https://registry.yarnpkg.com/osm-polygon-features/-/osm-polygon-features-0.9.2.tgz#20ae41130c486e49a3b2a3c2b58a1419c4986778"
 
-osmtogeojson@^2.2.12:
-  version "2.2.12"
-  resolved "https://registry.yarnpkg.com/osmtogeojson/-/osmtogeojson-2.2.12.tgz#f084f7d7d5f038a4383b31c036347a134b0819d3"
+osmtogeojson@^3.0.0-beta.0:
+  version "3.0.0-beta.0"
+  resolved "https://registry.yarnpkg.com/osmtogeojson/-/osmtogeojson-3.0.0-beta.0.tgz#7c75dbb17be6c90674161b898f96ceb21a8b25ad"
   dependencies:
     JSONStream "0.8.0"
     concat-stream "~1.0.1"
     geojson-numeric "0.2.0"
-    geojson-rewind "0.1.0"
+    geojson-rewind "0.2.0"
     htmlparser2 "3.5.1"
     optimist "~0.3.5"
     osm-polygon-features "^0.9.1"
+    tiny-osmpbf "^0.1.0"
     xmldom "~0.1.16"
 
 output-file-sync@^1.1.0:
@@ -4614,6 +4634,13 @@ path-type@^1.0.0:
 pbf@^1.3.2:
   version "1.3.7"
   resolved "https://registry.yarnpkg.com/pbf/-/pbf-1.3.7.tgz#1e3d047ba3cbe8086ae854a25503ab4537d4335d"
+  dependencies:
+    ieee754 "^1.1.6"
+    resolve-protobuf-schema "^2.0.0"
+
+pbf@^3.0.4:
+  version "3.0.5"
+  resolved "https://registry.yarnpkg.com/pbf/-/pbf-3.0.5.tgz#24f0fa2cbeb16e5c56a5901bb7e9c2ac0c8059be"
   dependencies:
     ieee754 "^1.1.6"
     resolve-protobuf-schema "^2.0.0"
@@ -5023,17 +5050,6 @@ qs@6.4.0, qs@~6.4.0:
   version "6.4.0"
   resolved "https://registry.yarnpkg.com/qs/-/qs-6.4.0.tgz#13e26d28ad6b0ffaa91312cd3bf708ed351e7233"
 
-query-overpass@^1.4.0:
-  version "1.4.0"
-  resolved "https://registry.yarnpkg.com/query-overpass/-/query-overpass-1.4.0.tgz#671656f39bf1dcbed96584756ee47a1ded83f459"
-  dependencies:
-    JSONStream "^1.3.1"
-    concat-stream "^1.6.0"
-    minimist "^1.2.0"
-    osmtogeojson "^2.2.12"
-    request "^2.81.0"
-    xhr "^2.4.0"
-
 query-string@^4.1.0:
   version "4.3.4"
   resolved "https://registry.yarnpkg.com/query-string/-/query-string-4.3.4.tgz#bbb693b9ca915c232515b228b1a02b609043dbeb"
@@ -5045,7 +5061,7 @@ querystring-es3@^0.2.0:
   version "0.2.1"
   resolved "https://registry.yarnpkg.com/querystring-es3/-/querystring-es3-0.2.1.tgz#9ec61f79049875707d69414596fd907a4d711e73"
 
-querystring@0.2.0:
+querystring@0.2.0, querystring@^0.2.0:
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/querystring/-/querystring-0.2.0.tgz#b209849203bb25df820da756e747005878521620"
 
@@ -6015,6 +6031,17 @@ timers-browserify@^2.0.2:
   dependencies:
     setimmediate "^1.0.4"
 
+tiny-inflate@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/tiny-inflate/-/tiny-inflate-1.0.2.tgz#93d9decffc8805bd57eae4310f0b745e9b6fb3a7"
+
+tiny-osmpbf@^0.1.0:
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/tiny-osmpbf/-/tiny-osmpbf-0.1.0.tgz#0a895717113ebe6aae363c4be5eefa8ecdafb927"
+  dependencies:
+    pbf "^3.0.4"
+    tiny-inflate "^1.0.2"
+
 tinyqueue@^1.1.0:
   version "1.2.2"
   resolved "https://registry.yarnpkg.com/tinyqueue/-/tinyqueue-1.2.2.tgz#947229e5e4197aba988acd27751dcc582e6728ff"
@@ -6105,8 +6132,8 @@ ua-parser-js@^0.7.9:
   resolved "https://registry.yarnpkg.com/ua-parser-js/-/ua-parser-js-0.7.12.tgz#04c81a99bdd5dc52263ea29d24c6bf8d4818a4bb"
 
 uglify-js@^2.6, uglify-js@~2.8.22:
-  version "2.8.23"
-  resolved "https://registry.yarnpkg.com/uglify-js/-/uglify-js-2.8.23.tgz#8230dd9783371232d62a7821e2cf9a817270a8a0"
+  version "2.8.25"
+  resolved "https://registry.yarnpkg.com/uglify-js/-/uglify-js-2.8.25.tgz#11b776e7c3925802853e4c3dd6d0ffad8eb72336"
   dependencies:
     source-map "~0.5.1"
     yargs "~3.10.0"

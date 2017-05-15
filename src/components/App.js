@@ -38,23 +38,21 @@ class App extends Component {
   switchModes() {
     let mode;
 
-    console.log(this.props.mode);
-
     switch (this.props.mode) {
-      case 'search':
-        mode = <Search/>;
-        break;
+    case 'search':
+      mode = <Search/>;
+      break;
 
-      case 'directions':
-        mode = <Directions/>;
-        break;
+    case 'directions':
+      mode = <Directions/>;
+      break;
 
-      case 'overpass':
-        mode = <Overpass/>;
-        break
+    case 'overpass':
+      mode = <Overpass/>;
+      break;
 
-      default:
-        mode = <Search/>;
+    default:
+      mode = <Overpass/>;
     }
 
     return mode;

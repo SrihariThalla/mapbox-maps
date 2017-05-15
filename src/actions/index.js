@@ -39,3 +39,8 @@ export const getReverseGeocode = (key, coordinates, accessToken) => ({
   coordinates,
   accessToken
 });
+
+export const getOverpassData = (query) => ({
+  type: 'GET_OVERPASS_DATA',
+  query,
+});

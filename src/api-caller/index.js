@@ -1,4 +1,8 @@
 import wdk from 'wikidata-sdk';
+import osmtogeojson from 'osmtogeojson';
+import querystring from 'querystring';
+import request from 'request';
+import JSONStream from '@sriharithalla/jsonstream';
 
 const apiCaller = (store) => (next) => (action) => { // eslint-disable-line
 
@@ -149,12 +153,55 @@ const apiCaller = (store) => (next) => (action) => { // eslint-disable-line
     break;
   }
 
+  case 'GET_OVERPASS_DATA': {
+    const url = 'http://overpass-api.de/api/interpreter';
+    let reqOptions = {
+      headers: {
+        'content-type': 'application/x-www-form-urlencoded'
+      },
+      body: querystring.stringify({
+        data: action.query
+      })
+    };
+    let options = action.options || {};
+
+    let r = request.post(url, reqOptions);
+
+    r
+      .on('response', (response) => {
+        if (response.statusCode !== 200) {
+          r.abort();
+          Promise.reject(new Error(response.statusCode));
+        }
+      })
+      .pipe(JSONStream.parse())
+      .on('data', (data) => {
+        let geojson;
+
+        geojson = osmtogeojson(data, {
+          flatProperties: options.flatProperties || false
+        });
+
+        next({
+          'type': 'SET_OVERPASS_DATA',
+          'overpassData': geojson,
+        });
+        next({
+          type: 'TRIGGER_MAP_UPDATE',
+          needMapRepan: true
+        });
+      })
+      .on('error', () => {
+        Promise.reject();
+      });
+
+    break;
+  }
+
   default:
     next(action); // let through as default
     break;
   }
-
-  return;
 };
 
 export default apiCaller;

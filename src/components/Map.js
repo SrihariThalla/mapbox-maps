@@ -103,6 +103,15 @@ class MapComponent extends Component {
       }
     }
 
+    // Overpass mode
+    if (this.props.mode === 'overpass') {
+      if (this.props.overpassData) {
+        this.map.getSource('overpass').setData(this.props.overpassData);
+      } else {
+        this.map.getSource('overpass').setData(this.emptyData);
+      }
+    }
+
     if (this.props.needMapRepan) {
       // Search mode
       if (this.props.mode === 'search') {
@@ -127,6 +136,13 @@ class MapComponent extends Component {
           this.moveTo(this.props.directionsTo);
           this.moveTo(this.props.directionsFrom);
         }
+      }
+
+      // Overpass mode
+      if (this.props.mode === 'overpass') {
+        const bbox = turfBbox(this.props.overpassData);
+        console.log(bbox);
+        this.moveTo({bbox: bbox});
       }
     }
 
@@ -348,6 +364,11 @@ class MapComponent extends Component {
       data: this.emptyData
     };
 
+    s.sources.overpass = {
+      type: 'geojson',
+      data: this.emptyData
+    };
+
     // Index to insert the route layers
     let i;
     if (style.name === 'MapboxMaps') {
@@ -412,6 +433,15 @@ class MapComponent extends Component {
         'layout': {
           'icon-image': 'fromLocation'
         },
+      },
+      {
+        'id': 'overpass',
+        'source': 'overpass',
+        'type': 'symbol',
+        'layout': {
+          'icon-image': 'pin',
+          'icon-offset': [0, -20]
+        }
       }
     ]);
 
@@ -469,6 +499,7 @@ MapComponent.propTypes = {
   directionsTo: PropTypes.object,
   getReverseGeocode: PropTypes.func,
   getRoute: PropTypes.func,
+  overpassData: PropTypes.object,
   map: PropTypes.object,
   mapStyle: PropTypes.string,
   modality: PropTypes.string,
@@ -493,6 +524,7 @@ const mapStateToProps = (state) => {
     center: state.mapCenter,
     directionsFrom: state.directionsFrom,
     directionsTo: state.directionsTo,
+    overpassData: state.overpassData,
     mapStyle: state.mapStyle,
     modality: state.modality,
     mode: state.mode,

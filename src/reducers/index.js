@@ -8,7 +8,7 @@ const defaultState = {
   mapZoom: 10,
   mapStyle: 'streets',
   // Mode
-  mode: 'search',
+  mode: 'overpass',
   modality: 'car',
   // Search
   searchString: '',
@@ -26,7 +26,10 @@ const defaultState = {
   directionsTo: null,
   route: null,
   routeStatus: 'idle',
-  lastQueried: 0
+  lastQueried: 0,
+  // Overpass
+  overpassQuery: '',
+  overpassData: null,
 };
 
 const reducer = (state = defaultState, action) => {
@@ -83,6 +86,12 @@ const reducer = (state = defaultState, action) => {
         routeStatus: 'error'
       });
     }
+  }
+
+  case 'SET_OVERPASS_DATA': {
+    return Object.assign({}, state, {
+      overpassData: action.overpassData,
+    });
   }
 
   default:
