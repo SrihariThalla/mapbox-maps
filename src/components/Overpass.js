@@ -14,10 +14,6 @@ class Overpass extends Component {
     };
   }
 
-  onInput(e) {
-    this.props.writeOverpassQuery(e.target.value);
-  }
-
   onKeyPress(e) {
     if (e.which === 13) {
       this.props.getOverpassData(this.props.overpassQuery);
@@ -28,10 +24,9 @@ class Overpass extends Component {
     let input = <input
       ref={(input) => { this.input = input; }}
       className={this.props.inputClass}
-      // onInput={this.onInput.bind(this)}
       onKeyPress={this.onKeyPress.bind(this)}
       value={this.props.overpassQuery}
-      onChange={this.onInput.bind(this)}
+      onChange={(e) => this.props.writeOverpassQuery(e.target.value)}
       placeholder='Overpass Query'
       type='text' />;
 
@@ -50,6 +45,13 @@ class Overpass extends Component {
         />
       </div>
     );
+  }
+
+  closeSearch() {
+    this.props.writeOverpassQuery('');
+    this.props.writeOverpassData(null);
+    this.props.triggerMapUpdate();
+    this.input.focus();
   }
 
   get styles() {
@@ -89,6 +91,7 @@ const mapDispatchToProps = (dispatch) => {
   return {
     getOverpassData: (query) => dispatch(getOverpassData(query)),
     triggerMapUpdate: (repan) => dispatch(triggerMapUpdate(repan)),
+    writeOverpassData: (data) => dispatch(setStateValue('overpassData', data)),
     writeOverpassQuery: (query) => dispatch(setStateValue('overpassQuery', query)),
   };
 };

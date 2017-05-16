@@ -1,0 +1,14 @@
+{
+    "id": "overpass-point",
+    "type": "circle",
+    "source": "overpass",
+    "paint": {
+        "circle-radius": 6,
+        "circle-color": "#B42222"
+    },
+    "filter": [
+        "==",
+        "$type",
+        "Point"
+    ]
+}

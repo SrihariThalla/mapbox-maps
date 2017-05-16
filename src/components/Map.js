@@ -10,6 +10,8 @@ import _ from 'lodash';
 // import streetsStyle from '../styles/streets.json';
 // import satelliteStyle from '../styles/satellite.json';
 import publicmapStyle from '../styles/publicmap.json';
+import overpassPointStyle from '../styles/overpass-Point.json';
+import overpassPolygonStyle from '../styles/overpass-Polygon.json';
 import {setStateValue, setUserLocation, triggerMapUpdate, getRoute, getReverseGeocode} from '../actions/index';
 
 class MapComponent extends Component {
@@ -434,15 +436,8 @@ class MapComponent extends Component {
           'icon-image': 'fromLocation'
         },
       },
-      {
-        'id': 'overpass',
-        'source': 'overpass',
-        'type': 'symbol',
-        'layout': {
-          'icon-image': 'pin',
-          'icon-offset': [0, -20]
-        }
-      }
+      overpassPointStyle,
+      overpassPolygonStyle,
     ]);
 
     return s;

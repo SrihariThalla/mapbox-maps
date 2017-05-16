@@ -1,0 +1,14 @@
+{
+    "id": "overpass-polygon",
+    "type": "fill",
+    "source": "overpass",
+    "paint": {
+        "fill-color": "#888888",
+        "fill-opacity": 0.4
+    },
+    "filter": [
+        "==",
+        "$type",
+        "Polygon"
+    ]
+}
