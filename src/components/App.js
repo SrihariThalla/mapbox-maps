@@ -1,27 +1,51 @@
+import PropTypes from 'prop-types';
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import MapComponent from './Map';
+import ContextMenu from './ContextMenu';
+import Map from './Map';
 import Search from './Search';
 import Directions from './Directions';
 import StyleSwitch from './StyleSwitch';
+import TrafficSwitch from './TrafficSwitch';
+import {setStateFromURL} from '../actions/index';
 
 class App extends Component {
+
+  componentWillMount() {
+    this.props.setStateFromURL();
+  }
+
   render() {
+    var moveOnLoad = this.props.url
+      .split('/')
+      .map(e => !e.startsWith('+'))
+      .reduce((a, b) => (a && b), true);
+
     return (
       <div className='root'>
-        <MapComponent/>
+        <Map moveOnLoad={moveOnLoad}/>
         <div className='relative m12 m24-mm w420-mm flex-parent flex-parent--column'>
           {
-            this.props.mode === 'directions'
+            (this.props.mode === 'directions')
             ? <Directions/>
             : <Search/>
           }
         </div>
         {
           (window.innerWidth > 640)
-          ? <div className='style-switch absolute bottom mb36 mx12 border border--2 border--white shadow-darken25'>
-            <StyleSwitch/>
-          </div>
+          ? <div className='absolute bottom mb36 mx12 bg-white shadow-darken25 px3 py3'>
+              <div className='relative'>
+                <TrafficSwitch/>
+              </div>
+              <div className='style-switch'>
+                <StyleSwitch/>
+              </div>
+            </div>
+          : null
+        }
+        {
+          (this.props.contextMenuActive === true)
+          ? <ContextMenu/>
           : null
         }
       </div>
@@ -30,21 +54,28 @@ class App extends Component {
 }
 
 App.propTypes = {
-  mode: React.PropTypes.string,
-  route: React.PropTypes.object,
-  routeStatus: React.PropTypes.string
+  contextMenuActive: PropTypes.bool,
+  mode: PropTypes.string,
+  route: PropTypes.object,
+  routeStatus: PropTypes.string,
+  setStateFromURL: PropTypes.func,
+  url: PropTypes.string
 };
 
 const mapStateToProps = (state) => {
   return {
-    mode: state.mode,
-    route: state.route,
-    routeStatus: state.routeStatus
+    contextMenuActive: state.app.contextMenuActive,
+    mode: state.app.mode,
+    route: state.app.route,
+    routeStatus: state.app.routeStatus,
+    url: state.router.location.pathname
   };
 };
 
-const mapDispatchToProps = () => {
-  return {};
+const mapDispatchToProps = (dispatch) => {
+  return {
+    setStateFromURL: () => dispatch(setStateFromURL())
+  };
 };
 
 export default connect(

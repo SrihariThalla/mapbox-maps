@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React, {Component} from 'react';
 
 class PlaceName extends Component {
@@ -16,8 +17,15 @@ class PlaceName extends Component {
       restColor = 'color-darken50';
     }
 
+    var className;
+    if (this.props.className) {
+      className = this.props.className;
+    } else {
+      className = 'txt-truncate w-full';
+    }
+
     return (
-      <div className='txt-truncate w-full' onClick={() => this.props.onClick()}>
+      <div className={className} onClick={() => this.props.onClick()}>
         {
           main === '__loading'
           ? <div className={'loading loading--s ' + (this.props.colors === 'light' ? 'loading--dark' : '')}></div>
@@ -30,9 +38,10 @@ class PlaceName extends Component {
 }
 
 PlaceName.propTypes = {
-  colors: React.PropTypes.string,
-  location: React.PropTypes.object,
-  onClick: React.PropTypes.func
+  colors: PropTypes.string,
+  className: PropTypes.string,
+  location: PropTypes.object,
+  onClick: PropTypes.func
 };
 
 PlaceName.defaultProps = {

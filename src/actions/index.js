@@ -4,6 +4,16 @@ export const setStateValue = (key, value) => ({
   value
 });
 
+export const setStateValues = (modifiedState) => ({
+  type: 'SET_STATE_VALUES',
+  modifiedState
+});
+
+export const resetStateKeys = (keys) => ({
+  type: 'RESET_STATE_KEYS',
+  keys
+});
+
 export const triggerMapUpdate = (needMapRepan) => ({
   type: 'TRIGGER_MAP_UPDATE',
   needMapRepan: !!needMapRepan || false
@@ -38,4 +48,18 @@ export const getReverseGeocode = (key, coordinates, accessToken) => ({
   key,
   coordinates,
   accessToken
+});
+
+export const setContextMenu = (coordinates, position) => ({
+  type: 'SET_CONTEXT_MENU',
+  coordinates,
+  position
+});
+
+export const resetContextMenu = () => ({
+  type: 'RESET_CONTEXT_MENU'
+});
+
+export const setStateFromURL = () => ({
+  type: 'SET_STATE_FROM_URL'
 });

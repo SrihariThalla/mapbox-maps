@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React, {Component} from 'react';
 import ImageWithFallback from './ImageWithFallback';
 import directionsIcon from '../assets/directions.svg';
@@ -14,7 +15,7 @@ class PlaceInfo extends Component {
           secondary={this.getImageUrl().full}
           alt={this.props.info.description}
         />
-        <div className='my-bg-blue flex-parent flex-parent--row'>
+        <div className='bg-blue flex-parent flex-parent--row'>
           <div className={this.styles.mainInfo}>
             <div className='color-white pl42 pr12 txt-h4 txt-bold'>{this.props.info.label}</div>
             <div className={'color-lighten75 pl42 pr12 txt-s ' + (window.innerWidth < 640 ? 'hide-visually' : '')}>{this.props.info.description}</div>
@@ -31,9 +32,9 @@ class PlaceInfo extends Component {
   }
 
   getImageUrl() {
+    // see https://commons.wikimedia.org/wiki/Commons:FAQ for how images are stored
     const claim = this.props.info.claims['P18'];
     if (claim && claim.length > 0) {
-      // see https://commons.wikimedia.org/wiki/Commons:FAQ for how images are stored
       const imageName = claim[0].replace(/ /g, '_');
       const baseUrl = 'https://upload.wikimedia.org/wikipedia/commons/';
       const hash = md5(imageName);
@@ -103,8 +104,8 @@ class PlaceInfo extends Component {
 }
 
 PlaceInfo.propTypes = {
-  clickDirections: React.PropTypes.func,
-  info: React.PropTypes.object,
+  clickDirections: PropTypes.func,
+  info: PropTypes.object,
 };
 
 export default PlaceInfo;

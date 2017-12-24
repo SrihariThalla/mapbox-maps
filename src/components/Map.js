@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import mapboxgl from 'mapbox-gl/dist/mapbox-gl';
@@ -5,10 +6,27 @@ import turfBbox from '@turf/bbox';
 import turfBboxPolygon from '@turf/bbox-polygon';
 import turfBuffer from '@turf/buffer';
 import turfDistance from '@turf/distance';
-import _ from 'lodash';
-import streetsStyle from '../styles/streets.json';
-import satelliteStyle from '../styles/satellite.json';
-import {setStateValue, setUserLocation, triggerMapUpdate, getRoute, getReverseGeocode} from '../actions/index';
+import {push} from 'react-router-redux';
+import {
+  setStateValue,
+  setUserLocation,
+  triggerMapUpdate,
+  getRoute,
+  getReverseGeocode,
+  setContextMenu,
+  resetContextMenu,
+  resetStateKeys
+} from '../actions/index';
+
+import style from '../styles/style.json';
+// Set the sprite URL in the style. It has to be a full, absolute URL.
+let spriteUrl;
+if (process.env.NODE_ENV === 'production') {
+  spriteUrl = process.env.PUBLIC_URL + '/sprite';
+} else { // Dev server runs on port 3000
+  spriteUrl = 'http://localhost:3000/sprite';
+}
+style.sprite = spriteUrl;
 
 class MapComponent extends Component {
   constructor(props) {
@@ -33,7 +51,7 @@ class MapComponent extends Component {
 
     const map = new mapboxgl.Map({
       container: 'map',
-      style: this.getStyle(streetsStyle),
+      style: style,
       center: this.props.center,
       zoom: this.props.zoom,
       minZoom: 2,
@@ -51,13 +69,14 @@ class MapComponent extends Component {
     if (!this.props.needMapUpdate) return;
 
     // This is where we update the layers and map bbox
-    this.map.getSource('geolocation').setData(this.props.userLocation.geometry);
-
+    if (this.props.userLocation && this.props.userLocation.geometry) {
+      this.map.getSource('geolocation').setData(this.props.userLocation.geometry);
+    }
 
     // Search mode
     if (this.props.mode === 'search') {
       if (this.props.searchLocation) {
-        this.map.getSource('marker').setData(this.props.searchLocation.geometry);
+        if (this.props.searchLocation.geometry) this.map.getSource('marker').setData(this.props.searchLocation.geometry);
       } else {
         this.map.getSource('marker').setData(this.emptyData);
       }
@@ -90,7 +109,7 @@ class MapComponent extends Component {
       // We have origin and destination but no route yet
       if (this.props.directionsFrom && this.props.directionsTo && this.props.route === null) {
         // Do not retry when the previous request errored
-        if (this.props.routeStatus !== 'error') {
+        if (this.props.routeStatus !== 'error' && this.props.routeStatus !== 'paused') {
           // Trigger the API call to directions
           this.props.getRoute(
             this.props.directionsFrom,
@@ -130,8 +149,7 @@ class MapComponent extends Component {
     }
 
     if (this.props.needMapRestyle) {
-      if (this.props.mapStyle === 'satellite') this.map.setStyle(this.getStyle(satelliteStyle));
-      else if (this.props.mapStyle === 'streets') this.map.setStyle(this.getStyle(streetsStyle));
+      this.updateStyle(this.props.mapStyle);
     } else {
       // No need to re-update until the state says so
       this.props.setStateValue('needMapUpdate', false);
@@ -176,7 +194,8 @@ class MapComponent extends Component {
 
     // Mouse events
     this.map.on('mousemove', mouseMoveFn);
-    this.map.once('mouseup', () => this.onUp());
+    this.map.once('mousemove', (e) => this.onceMove(e));
+    this.map.once('mouseup', (e) => this.onUp(e));
   }
 
   onMove(e) {
@@ -197,19 +216,26 @@ class MapComponent extends Component {
     };
 
     this.map.getSource(layerId).setData(geometry);
+  }
 
-    this.props.setStateValue('placeInfo', null);
-    this.props.setStateValue('searchLocation', null);
+  onceMove(e, status = 'paused') {
+    var coords = [e.lngLat.lng, e.lngLat.lat];
+    const geometry = {
+      type: 'Point',
+      coordinates: coords
+    };
+
+    const layerId = this.state.draggedLayer;
+    this.props.resetStateKeys(['placeInfo', 'searchLocation', 'route', 'routeStatus']);
+    this.props.setStateValue('routeStatus', status); // pause route updates
     this.props.setStateValue(this.layerToKey(layerId), {
       'place_name': '__loading',
       'geometry': geometry
     });
-    this.props.setStateValue('route', undefined); // Will make the route disappear without triggering a call to the API
-    this.props.setStateValue('routeStatus', 'idle');
     this.props.triggerMapUpdate();
   }
 
-  onUp() {
+  onUp(e) {
     if (!this.state.isDragging) return;
 
     this.map.getCanvas().style.cursor = '';
@@ -223,29 +249,33 @@ class MapComponent extends Component {
       this.props.accessToken
     );
 
+    this.onceMove(e, 'idle');
     this.setState({isDragging: false, draggedLayer: '', draggedCoords: null});
-
-    this.props.setStateValue('route', null); // retrigger API call
-    this.props.triggerMapUpdate();
   }
 
   onClick(e) {
     var features = this.map.queryRenderedFeatures(e.point, {layers: this.selectableLayers});
+
     if (!features.length) {
+      // No feature is selected, reset the search location on click on the map
+      if (this.props.mode === 'search' && !this.props.contextMenuActive) {
+        this.props.resetStateKeys(['placeInfo', 'searchString', 'searchLocation']);
+        this.props.triggerMapUpdate();
+      }
       return;
     }
 
+    // We have a selected feature
     var feature = features[0];
 
     let key;
     if (this.props.mode === 'search') {
-      this.props.setStateValue('placeInfo', null);
+      this.props.resetStateKeys(['placeInfo']);
       key = 'searchLocation';
     } else if (!this.props.directionsFrom) {
       key = 'directionsFrom';
     } else {
-      this.props.setStateValue('route', null);
-      this.props.setStateValue('searchLocation', null);
+      this.props.resetStateKeys(['route', 'searchLocation']);
       key = 'directionsTo';
     }
 
@@ -260,14 +290,36 @@ class MapComponent extends Component {
     }
   }
 
+  onContextMenu(e) {
+    let coordinates = [e.lngLat.lng, e.lngLat.lat];
+    let location = [e.point.x, e.point.y];
+    this.props.getReverseGeocode(
+      'contextMenuPlace',
+      coordinates,
+      this.props.accessToken
+    );
+    this.props.setContextMenu(coordinates, location);
+
+    this.map
+      .once('move', () => this.props.resetContextMenu())
+      .once('click', () => this.props.resetContextMenu());
+  }
+
   onLoad() {
     // helper to set geolocation
     const setGeolocation = (data) => {
       const geometry = {type: 'Point', coordinates: [data.coords.longitude, data.coords.latitude]};
       this.map.getSource('geolocation').setData(geometry);
       this.props.setUserLocation(geometry.coordinates);
-      this.moveTo(geometry, 13);
+      if (this.props.moveOnLoad) this.moveTo(geometry, 13);
     };
+
+    // Create scale control
+    const scaleControl = new mapboxgl.ScaleControl({
+      maxWidth: 80,
+      unit: 'metric'
+    });
+    this.map.addControl(scaleControl, 'bottom-right');
 
     // Create geolocation control
     const geolocateControl = new mapboxgl.GeolocateControl();
@@ -277,7 +329,7 @@ class MapComponent extends Component {
     // Initial ask for location and display on the map
     if (this.props.userLocation) {
       this.map.getSource('geolocation').setData(this.props.userLocation.geometry);
-      this.moveTo(this.props.userLocation, 13);
+      if (this.props.moveOnLoad) this.moveTo(this.props.userLocation, 13);
     } else if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(setGeolocation);
     }
@@ -297,6 +349,8 @@ class MapComponent extends Component {
 
     this.map.on('click', (e) => this.onClick(e));
 
+    this.map.on('contextmenu', (e) => this.onContextMenu(e));
+
     this.map.on('mousemove', (e) => {
       var features = this.map.queryRenderedFeatures(e.point, {layers: this.movableLayers.concat(this.selectableLayers)});
 
@@ -313,104 +367,51 @@ class MapComponent extends Component {
       }
     });
 
-    this.map.on('mousedown', (e) => this.mouseDown(e), true);
+    this.map.on('mousedown', (e) => this.mouseDown(e));
 
     this.map.on('moveend', () => {
       const center = this.map.getCenter();
-      this.props.setStateValue('mapCenter', [center.lng, center.lat]);
-      this.props.setStateValue('mapZoom', this.map.getZoom());
+      const zoom = this.map.getZoom();
+      this.props.setStateValue('mapCoords', [center.lng, center.lat, zoom]);
     });
+
+    // Update the style if needed
+    this.updateStyle(this.props.mapStyle);
+
+    // Final update if the original state has some data
+    this.props.triggerMapUpdate();
   }
 
-  getStyle(style) {
-    let s = _.cloneDeep(style);
-
-    s.sources.route = {
-      type: 'geojson',
-      data: this.emptyData
-    };
-
-    s.sources.marker = {
-      type: 'geojson',
-      data: this.emptyData
-    };
-
-    s.sources.geolocation = {
-      type: 'geojson',
-      data: this.emptyData
-    };
-
-    s.sources.fromMarker = {
-      type: 'geojson',
-      data: this.emptyData
-    };
-
-    // Index to insert the route layers
-    var i;
-    if (style.name === 'MapboxMaps') {
-      i = s.layers.map(el => el.id).indexOf('bridge-oneway-arrows-white');
+  updateStyle(styleString) {
+    if (styleString.indexOf('traffic') > -1) {
+      this.map.getStyle().layers.forEach(layer => {
+        if (layer.source === 'traffic') this.map.setLayoutProperty(layer.id, 'visibility', 'visible');
+        // TODO here, change the color of motorways and trunks to white
+      });
     } else {
-      i = s.layers.map(el => el.id).indexOf('waterway-label');
+      this.map.getStyle().layers.forEach(layer => {
+        if (layer.source === 'traffic') this.map.setLayoutProperty(layer.id, 'visibility', 'none');
+        // TODO here, change the color of motorways and trunks back to orange/yellow (look in the `style` variable?)
+      });
     }
 
-    s.layers.splice(i, 0,
-      {
-        'id': 'route-casing',
-        'source': 'route',
-        'type': 'line',
-        'paint': {
-          'line-color': '#2779b5',
-          'line-width': 6.5
-        },
-        'layout': {
-          'line-join': 'round',
-          'line-cap': 'round'
-        },
-      },
-      {
-        'id': 'route',
-        'source': 'route',
-        'type': 'line',
-        'paint': {
-          'line-color': '#2abaf7',
-          'line-width': 5.5
-        },
-        'layout': {
-          'line-join': 'round',
-          'line-cap': 'round'
-        },
-      }
-    );
+    if (styleString.indexOf('satellite') > -1) {
+      this.map.setLayoutProperty('satellite', 'visibility', 'visible');
+      // TODO add labels and stuff?
+      // timeout to have a smooth transition, no flash
+      setTimeout(() => {
+        this.map.getStyle().layers.forEach(layer => {
+          if (layer.source === 'composite') this.map.setLayoutProperty(layer.id, 'visibility', 'none');
+        });
+      }, 300);
+    } else {
+      this.map.getStyle().layers.forEach(layer => {
+        if (layer.source === 'composite') this.map.setLayoutProperty(layer.id, 'visibility', 'visible');
+      });
+      this.map.setLayoutProperty('satellite', 'visibility', 'none');
+    }
 
-    s.layers = s.layers.concat([
-      {
-        'id': 'geolocation',
-        'source': 'geolocation',
-        'type': 'symbol',
-        'layout': {
-          'icon-image': 'geolocation'
-        },
-      },
-      {
-        'id': 'marker',
-        'source': 'marker',
-        'type': 'symbol',
-        'layout': {
-          'icon-image': 'pin',
-          'icon-offset': [0, -20]
-        },
-      },
-      {
-        'id': 'fromMarker',
-        'source': 'fromMarker',
-        'type': 'symbol',
-        'layout': {
-          'icon-image': 'fromLocation'
-        },
-      }
-    ]);
-
-    return s;
+    return styleString;
   }
 
   layerToKey(layer) {
@@ -436,8 +437,7 @@ class MapComponent extends Component {
       'poi-parks-scalerank2',
       'poi-scalerank3',
       'poi-parks-scalerank3',
-      'poi-scalerank4-l1',
-      'poi-scalerank4-l15',
+      'poi-scalerank4',
       'poi-parks-scalerank4',
     ];
   }
@@ -448,47 +448,53 @@ class MapComponent extends Component {
 }
 
 MapComponent.propTypes = {
-  accessToken: React.PropTypes.string,
-  center: React.PropTypes.array,
-  directionsFrom: React.PropTypes.object,
-  directionsTo: React.PropTypes.object,
-  getReverseGeocode: React.PropTypes.func,
-  getRoute: React.PropTypes.func,
-  map: React.PropTypes.object,
-  mapStyle: React.PropTypes.string,
-  modality: React.PropTypes.string,
-  mode: React.PropTypes.string,
-  needMapRepan: React.PropTypes.bool,
-  needMapRestyle: React.PropTypes.bool,
-  needMapUpdate: React.PropTypes.bool,
-  route: React.PropTypes.object,
-  routeStatus: React.PropTypes.string,
-  searchLocation: React.PropTypes.object,
-  setStateValue: React.PropTypes.func,
-  setUserLocation: React.PropTypes.func,
-  style: React.PropTypes.string,
-  triggerMapUpdate: React.PropTypes.func,
-  userLocation: React.PropTypes.object,
-  zoom: React.PropTypes.number,
+  accessToken: PropTypes.string,
+  center: PropTypes.array,
+  contextMenuActive: PropTypes.bool,
+  directionsFrom: PropTypes.object,
+  directionsTo: PropTypes.object,
+  getReverseGeocode: PropTypes.func,
+  getRoute: PropTypes.func,
+  map: PropTypes.object,
+  mapStyle: PropTypes.string,
+  modality: PropTypes.string,
+  mode: PropTypes.string,
+  moveOnLoad: PropTypes.bool,
+  needMapRepan: PropTypes.bool,
+  needMapRestyle: PropTypes.bool,
+  needMapUpdate: PropTypes.bool,
+  pushHistory: PropTypes.func,
+  resetContextMenu: PropTypes.func,
+  resetStateKeys: PropTypes.func,
+  route: PropTypes.object,
+  routeStatus: PropTypes.string,
+  searchLocation: PropTypes.object,
+  setContextMenu: PropTypes.func,
+  setStateValue: PropTypes.func,
+  setUserLocation: PropTypes.func,
+  triggerMapUpdate: PropTypes.func,
+  userLocation: PropTypes.object,
+  zoom: PropTypes.number,
 };
 
 const mapStateToProps = (state) => {
   return {
-    accessToken: state.mapboxAccessToken,
-    center: state.mapCenter,
-    directionsFrom: state.directionsFrom,
-    directionsTo: state.directionsTo,
-    mapStyle: state.mapStyle,
-    modality: state.modality,
-    mode: state.mode,
-    needMapRepan: state.needMapRepan,
-    needMapRestyle: state.needMapRestyle,
-    needMapUpdate: state.needMapUpdate,
-    route: state.route,
-    routeStatus: state.routeStatus,
-    searchLocation: state.searchLocation,
-    userLocation: state.userLocation,
-    zoom: state.mapZoom,
+    accessToken: state.app.mapboxAccessToken,
+    center: state.app.mapCoords.slice(0, 2),
+    contextMenuActive: state.app.contextMenuActive,
+    directionsFrom: state.app.directionsFrom,
+    directionsTo: state.app.directionsTo,
+    mapStyle: state.app.mapStyle,
+    modality: state.app.modality,
+    mode: state.app.mode,
+    needMapRepan: state.app.needMapRepan,
+    needMapRestyle: state.app.needMapRestyle,
+    needMapUpdate: state.app.needMapUpdate,
+    route: state.app.route,
+    routeStatus: state.app.routeStatus,
+    searchLocation: state.app.searchLocation,
+    userLocation: state.app.userLocation,
+    zoom: state.app.mapCoords[2],
   };
 };
 
@@ -496,9 +502,13 @@ const mapDispatchToProps = (dispatch) => {
   return {
     getReverseGeocode: (key, coordinates, accessToken) => dispatch(getReverseGeocode(key, coordinates, accessToken)),
     getRoute: (directionsFrom, directionsTo, modality, accessToken) => dispatch(getRoute(directionsFrom, directionsTo, modality, accessToken)),
+    pushHistory: (url) => dispatch(push(url)),
+    resetContextMenu: () => dispatch(resetContextMenu()),
+    setContextMenu: (coordinates, location) => dispatch(setContextMenu(coordinates, location)),
     setStateValue: (key, value) => dispatch(setStateValue(key, value)),
     setUserLocation: (coordinates) => dispatch(setUserLocation(coordinates)),
     triggerMapUpdate: (repan) => dispatch(triggerMapUpdate(repan)),
+    resetStateKeys: (keys) => dispatch(resetStateKeys(keys))
   };
 };
 

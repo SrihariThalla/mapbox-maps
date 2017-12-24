@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import Geocoder from './Geocoder';
@@ -7,7 +8,7 @@ import RoutePanel from './RoutePanel';
 import ModalityButtons from './ModalityButtons';
 import MyLocation from './MyLocation';
 import swapDirectionsIcon from '../assets/swapDirections.svg';
-import {triggerMapUpdate, setDirectionsLocation, setStateValue} from '../actions/index';
+import {triggerMapUpdate, setDirectionsLocation, setStateValue, resetStateKeys} from '../actions/index';
 
 class Directions extends Component {
   render() {
@@ -25,8 +26,7 @@ class Directions extends Component {
             modality={this.props.modality}
             onSetModality={(modality) => {
               this.props.setModality(modality);
-              this.props.setRoute(null);
-              this.props.setStateValue('routeStatus', 'idle');
+              this.props.resetStateKeys(['route', 'routeStatus']);
               this.props.triggerMapUpdate();
             }}
           />
@@ -80,11 +80,7 @@ class Directions extends Component {
                       colors='light'
                       onClick={() => {
                         this.props.writeSearchTo(this.props.directionsTo.place_name);
-                        this.props.setDirectionsLocation('to', null);
-                        this.props.setRoute(null);
-                        this.props.setStateValue('searchLocation', null);
-                        this.props.setStateValue('searchString', '');
-                        this.props.setStateValue('routeStatus', 'idle');
+                        this.props.resetStateKeys(['route', 'searchLocation', 'searchString', 'routeStatus', 'directionsTo']);
                       }}
                     />
                   </div>
@@ -116,7 +112,7 @@ class Directions extends Component {
         }
 
         {
-          (this.props.route || this.props.routeStatus !== 'idle')
+          (this.props.route || this.props.routeStatus === 'pending' || this.props.routeStatus === 'error')
           ? <RoutePanel/>
           : null
         }
@@ -143,20 +139,13 @@ class Directions extends Component {
     if (kind === 'from') this.props.writeSearchFrom('');
     if (kind === 'to') this.props.writeSearchTo('');
     this.props.setDirectionsLocation(kind, null);
-    this.props.setRoute(null);
-    this.props.setStateValue('routeStatus', 'idle');
-    this.props.setStateValue('searchLocation', null);
+    this.props.resetStateKeys(['route', 'routeStatus', 'searchLocation']);
     this.props.triggerMapUpdate();
   }
 
   exitDirections() {
     this.props.setMode('search');
-    this.props.setDirectionsLocation('from', null);
-    this.props.setDirectionsLocation('to', null);
-    this.props.writeSearchFrom('');
-    this.props.writeSearchTo('');
-    this.props.setRoute(null);
-    this.props.setStateValue('routeStatus', 'idle');
+    this.props.resetStateKeys(['route', 'routeStatus', 'directionsFromString', 'directionsToString', 'directionsFrom', 'directionsTo']);
     this.props.triggerMapUpdate();
   }
 
@@ -183,7 +172,7 @@ class Directions extends Component {
 
   get styles() {
     return {
-      directions: 'relative my-bg-blue w-full w420-mm shadow-darken25 flex-parent flex-parent--column',
+      directions: 'relative bg-blue w-full w420-mm shadow-darken25 flex-parent flex-parent--column',
       input: 'input directions-input border--transparent color-white px48 h42 w-full',
       placeName: 'txt-truncate w-full color-white px48 h42 flex-parent flex-parent--row flex-parent--center-cross',
       results: 'absolute w-full bg-white shadow-darken5 border-darken10',
@@ -194,39 +183,41 @@ class Directions extends Component {
 }
 
 Directions.propTypes = {
-  directionsFrom: React.PropTypes.object,
-  directionsFromString: React.PropTypes.string,
-  directionsTo: React.PropTypes.object,
-  directionsToString: React.PropTypes.string,
-  modality: React.PropTypes.string,
-  route: React.PropTypes.object,
-  routeStatus: React.PropTypes.string,
-  setDirectionsLocation: React.PropTypes.func,
-  setModality: React.PropTypes.func,
-  setMode: React.PropTypes.func,
-  setRoute: React.PropTypes.func,
-  setStateValue: React.PropTypes.func,
-  triggerMapUpdate: React.PropTypes.func,
-  userLocation: React.PropTypes.object,
-  writeSearchFrom: React.PropTypes.func,
-  writeSearchTo: React.PropTypes.func,
+  directionsFrom: PropTypes.object,
+  directionsFromString: PropTypes.string,
+  directionsTo: PropTypes.object,
+  directionsToString: PropTypes.string,
+  modality: PropTypes.string,
+  resetStateKeys: PropTypes.func,
+  route: PropTypes.object,
+  routeStatus: PropTypes.string,
+  setDirectionsLocation: PropTypes.func,
+  setModality: PropTypes.func,
+  setMode: PropTypes.func,
+  setRoute: PropTypes.func,
+  setStateValue: PropTypes.func,
+  triggerMapUpdate: PropTypes.func,
+  userLocation: PropTypes.object,
+  writeSearchFrom: PropTypes.func,
+  writeSearchTo: PropTypes.func,
 };
 
 const mapStateToProps = (state) => {
   return {
-    directionsFrom: state.directionsFrom,
-    directionsFromString: state.directionsFromString,
-    directionsTo: state.directionsTo,
-    directionsToString: state.directionsToString,
-    modality: state.modality,
-    route: state.route,
-    routeStatus: state.routeStatus,
-    userLocation: state.userLocation,
+    directionsFrom: state.app.directionsFrom,
+    directionsFromString: state.app.directionsFromString,
+    directionsTo: state.app.directionsTo,
+    directionsToString: state.app.directionsToString,
+    modality: state.app.modality,
+    route: state.app.route,
+    routeStatus: state.app.routeStatus,
+    userLocation: state.app.userLocation,
   };
 };
 
 const mapDispatchToProps = (dispatch) => {
   return {
+    resetStateKeys: (keys) => dispatch(resetStateKeys(keys)),
     setDirectionsLocation: (kind, location) => dispatch(setDirectionsLocation(kind, location)),
     setModality: (modality) => dispatch(setStateValue('modality', modality)),
     setMode: (mode) => dispatch(setStateValue('mode', mode)),
